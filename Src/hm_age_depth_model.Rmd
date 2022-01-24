@@ -1,0 +1,94 @@
+---
+title: "Replication document for age-depth model of Ha Makotoko"
+author: "W. Christopher Carleton"
+output: pdf_document
+---
+
+## Load Necessary Libraries and Data
+```{r}
+library(Bchron)
+library(ggplot2)
+
+hm_data <- read.csv("../Data/HM_age_depth_isotopes.csv")
+hm_data_bchron <- read.csv("../Data/HM_age_depth_bchron.csv")[-c(6),]
+
+sample_depths <- hm_data$depth_m
+sample_depths <- sample_depths[!is.na(sample_depths)]
+interp_depth_range <- range(sample_depths)
+interp_depths <- seq(0,
+                    interp_depth_range[2],
+                    0.01)
+```
+
+## Run Bchronology
+```{r, echo=TRUE, results='hide'}
+hm_agedepth <- Bchronology(ages = hm_data_bchron$c14age,
+                            ageSds = hm_data_bchron$sd,
+                            positions = hm_data_bchron$depth,
+                            positionThicknesses = hm_data_bchron$thickness,
+                            calCurves = hm_data_bchron$curve,
+                            predictPositions = interp_depths)
+```
+
+## Summarize the model
+```{r}
+hm_agedepth_mean <- apply(hm_agedepth$thetaPredict,
+                        2,
+                        mean)
+
+hm_agedepth_quant <- t(apply(hm_agedepth$thetaPredict,
+                            2,
+                            quantile,
+                            probs = c(0.05, 0.95)))
+
+hm_agedepth_summary <- data.frame(Depth = interp_depths,
+                                    Mean = hm_agedepth_mean,
+                                    L05 = hm_agedepth_quant[, 1],
+                                    U95 = hm_agedepth_quant[, 2])
+
+hm_agedepth_summary_sample <- subset(hm_agedepth_summary,
+                                    Depth %in% sample_depths)
+```
+
+## Write out results
+```{r}
+write.table(hm_agedepth_summary,
+            file = "./hm_agedepth_Bchron.csv",
+            sep = ",",
+            row.names = F)
+
+write.table(hm_agedepth_summary_sample,
+            file = "./hm_agedepth_Bchron_sample.csv",
+            sep = ",",
+            row.names = F)
+
+hm_data_with_agedepth <- merge(hm_data,
+                            hm_agedepth_summary_sample,
+                            by.x = 5,
+                            by.y = 1)
+
+write.table(hm_data_with_agedepth,
+            file = "./hm_agedepth_Bchron_sample_merged.csv",
+            sep = ",",
+            row.names = F)
+```
+
+## Plot the model
+```{r}
+ggplot(hm_agedepth_summary) +
+    geom_ribbon(mapping = aes(xmin = L05, xmax = U95, y = Depth),
+                fill = "steelblue") +
+    geom_line(mapping = aes(y = Depth, x = Mean)) +
+    geom_point(data = hm_agedepth_summary_sample,
+            mapping = aes(y = Depth, x = Mean)) +
+    geom_text(data = hm_agedepth_summary_sample,
+            mapping = aes(y = Depth, x = Mean, label = Depth),
+            nudge_x = 2000) +
+    labs(x = "Year BP",
+        y = "Depth (m)") +
+    scale_y_reverse() +
+    scale_x_reverse() +
+    theme_minimal()
+ggsave(device = "pdf",
+    file = "./agedepth_Bchron.pdf")
+```
