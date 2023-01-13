@@ -8,6 +8,7 @@ output: pdf_document
 ```{r}
 library(Bchron)
 library(ggplot2)
+library(ggrepel)
 
 hm_data <- read.csv("../Data/HM_age_depth_isotopes.csv")
 hm_data_bchron <- read.csv("../Data/HM_age_depth_bchron.csv")[-c(6),]
@@ -67,7 +68,21 @@ hm_data_with_agedepth <- merge(hm_data,
                             by.x = 5,
                             by.y = 1)
 
-write.table(hm_data_with_agedepth,
+# funcion for rounding if a column is numeric (for print/publication formatting of the age-depth summary)
+round_numeric <- function(x){
+    if(is.numeric(x)){
+        return(round(x, 2))
+    } else{
+        return(x)
+    }
+}
+
+hm_data_with_agedepth_rnd <- hm_data_with_agedepth
+for(j in 1:ncol(hm_data_with_agedepth_rnd)){
+    hm_data_with_agedepth_rnd[, j] <- round_numeric(hm_data_with_agedepth_rnd[, j])
+}
+
+write.table(hm_data_with_agedepth_rnd,
             file = "./hm_agedepth_Bchron_sample_merged.csv",
             sep = ",",
             row.names = F)
@@ -81,7 +96,7 @@ ggplot(hm_agedepth_summary) +
     geom_line(mapping = aes(y = Depth, x = Mean)) +
     geom_point(data = hm_agedepth_summary_sample,
             mapping = aes(y = Depth, x = Mean)) +
-    geom_text(data = hm_agedepth_summary_sample,
+    geom_text_repel(data = hm_agedepth_summary_sample,
             mapping = aes(y = Depth, x = Mean, label = Depth),
             nudge_x = 2000) +
     labs(x = "Year BP",
