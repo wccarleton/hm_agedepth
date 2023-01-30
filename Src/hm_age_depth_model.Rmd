@@ -26,7 +26,7 @@ interp_depths <- seq(0,
 ```{r, echo=TRUE, results='hide'}
 hm_agedepth <- Bchronology(ages = hm_data_bchron$c14age,
                             ageSds = hm_data_bchron$sd,
-                            positions = hm_data_bchron$depth - 0.06,
+                            positions = hm_data_bchron$depth,
                             positionThicknesses = hm_data_bchron$thickness,
                             calCurves = hm_data_bchron$curve,
                             predictPositions = interp_depths,
