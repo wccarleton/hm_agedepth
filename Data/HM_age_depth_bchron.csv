@@ -1,8 +1,8 @@
-SampleID,c14age,sd,Context number,depth,thickness,curve
-None,0,30,5,0.06,0.01,normal
-UGAMS-8984,9110,30,23,0.5,0.01,intcal20
-UGAMS-8985,9320,30,32,0.55,0.01,intcal20
-UGAMS-8986,10060,30,136,0.62,0.01,intcal20
-UGAMS-8987,9870,30,93,0.62,0.01,intcal20
-UGAMS-11595,25470,70,86,,0.01,intcal20
-UGAMS-8988,40100,230,60,0.66,0.01,intcal20
+sample_id,c14age,sd,context_number,depth_m,thickness_m,curve
+None,0,15,5,0.06,0.01,normal
+UGAMS-8984,9110,30,23,0.5,0.01,shcal20
+UGAMS-8985,9320,30,32,0.55,0.01,shcal20
+UGAMS-8986,10060,30,136,0.62,0.01,shcal20
+UGAMS-8987,9870,30,93,0.62,0.01,shcal20
+UGAMS-11595,25470,70,86,,0.01,shcal20
+UGAMS-8988,40100,230,60,0.66,0.01,shcal20

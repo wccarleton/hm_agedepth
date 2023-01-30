@@ -10,6 +10,7 @@ library(Bchron)
 library(ggplot2)
 
 hm_data <- read.csv("../Data/HM_age_depth_isotopes.csv")
+
 hm_data_bchron <- read.csv("../Data/HM_age_depth_bchron.csv")[-c(6),]
 
 sample_depths <- hm_data$depth_m
@@ -24,10 +25,11 @@ interp_depths <- seq(0,
 ```{r, echo=TRUE, results='hide'}
 hm_agedepth <- Bchronology(ages = hm_data_bchron$c14age,
                             ageSds = hm_data_bchron$sd,
-                            positions = hm_data_bchron$depth,
+                            positions = hm_data_bchron$depth - 0.06,
                             positionThicknesses = hm_data_bchron$thickness,
                             calCurves = hm_data_bchron$curve,
-                            predictPositions = interp_depths)
+                            predictPositions = interp_depths,
+                            extractDate = 1950 - 2009)
 ```
 
 ## Summarize the model
@@ -53,12 +55,12 @@ hm_agedepth_summary_sample <- subset(hm_agedepth_summary,
 ## Write out results
 ```{r}
 write.table(hm_agedepth_summary,
-            file = "./hm_agedepth_Bchron.csv",
+            file = "../Output/hm_agedepth_Bchron.csv",
             sep = ",",
             row.names = F)
 
 write.table(hm_agedepth_summary_sample,
-            file = "./hm_agedepth_Bchron_sample.csv",
+            file = "../Output/hm_agedepth_Bchron_sample.csv",
             sep = ",",
             row.names = F)
 
@@ -68,7 +70,7 @@ hm_data_with_agedepth <- merge(hm_data,
                             by.y = 1)
 
 write.table(hm_data_with_agedepth,
-            file = "./hm_agedepth_Bchron_sample_merged.csv",
+            file = "../Output/hm_agedepth_Bchron_sample_merged.csv",
             sep = ",",
             row.names = F)
 ```
@@ -90,5 +92,5 @@ ggplot(hm_agedepth_summary) +
     scale_x_reverse() +
     theme_minimal()
 ggsave(device = "pdf",
-    file = "./agedepth_Bchron.pdf")
+    file = "../Output/agedepth_Bchron.pdf")
 ```
