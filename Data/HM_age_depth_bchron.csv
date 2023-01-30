@@ -1,5 +1,5 @@
 sample_id,c14age,sd,context_number,depth_m,thickness_m,curve
-None,0,15,5,0.06,0.01,normal
+None,0,30,5,0.03,0.06,normal
 UGAMS-8984,9110,30,23,0.5,0.01,shcal20
 UGAMS-8985,9320,30,32,0.55,0.01,shcal20
 UGAMS-8986,10060,30,136,0.62,0.01,shcal20
