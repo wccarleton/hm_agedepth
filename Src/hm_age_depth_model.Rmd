@@ -9,6 +9,7 @@ output: pdf_document
 library(Bchron)
 library(ggplot2)
 library(ggrepel)
+library(tidyverse)
 
 hm_data <- read.csv("../Data/HM_age_depth_isotopes.csv")
 
@@ -74,6 +75,42 @@ write.table(hm_data_with_agedepth,
             file = "../Output/hm_agedepth_Bchron_sample_merged.csv",
             sep = ",",
             row.names = F)
+```
+
+## Plot the modelled tie-points
+```{r}
+
+df <- as.tibble(hm_agedepth$theta)
+names(df) <- c("modern", hm_data_bchron$SampleID[-1])
+
+tie_point_posteriors <- pivot_longer(df,
+                                    everything(),
+                                    names_to = "tie_point_id",
+                                    values_to = "ybp_sample")
+
+depth_labels <- data.frame(tie_point_id = names(df),
+                            x = 40000, 
+                            y = 0.9, 
+                            depthlabel = paste(hm_data_bchron$depth,
+                                                " ± 0.01",
+                                                "m", 
+                                                sep=""))
+
+ggplot(tie_point_posteriors) +
+    geom_histogram(aes(x = ybp_sample, y = ..ncount..),
+                    alpha = 0.8,
+                    binwidth = 100) +
+    geom_text(data = depth_labels, 
+                aes(x = x, y = y, label = depthlabel)) +
+    facet_grid(tie_point_id ~ .) +
+    labs(x = "Year BP\n(100 year bin width)", y = "Scaled Count") +
+    theme_minimal()
+ggsave(device = "pdf",
+    file = "./Output/agedepth_Bchron_tiepoints.pdf",
+    width = 10,
+    height = 10,
+    units = "cm",
+    scale = 1.5)
 ```
 
 ## Plot the model
